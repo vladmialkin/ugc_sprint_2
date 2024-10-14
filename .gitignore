@@ -1,0 +1,13 @@
+*.log
+
+.env
+.local.env
+
+.idea
+*./idea
+
+*/dbs
+*/db
+
+*.pyc
+*/__pycache__

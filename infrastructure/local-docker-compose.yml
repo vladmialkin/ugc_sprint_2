@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: movies-postgres-local
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - postgresql_initdb_data:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: movies-pgadmin-local
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    restart: always
+
+  redis:
+    image: redis:7.4.0
+    container_name: movies-redis-local
+    ports:
+        - "6379:6379"
+    volumes:
+        - redis_data:/data/
+    command: redis-server --databases 2
+    restart: always
+
+volumes:
+  postgresql_data:
+    name: postgresql_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./postgresql/data
+  postgresql_initdb_data:
+    name: postgresql_initdb_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./postgresql/initdb
+  pgadmin_data:
+    name: pgadmin_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./pgadmin/data
+  redis_data:
+    name: redis_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./redis
