@@ -10,24 +10,7 @@ services:
 #    networks:
 #      - movies-network
 
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
-    env_file:
-      - src/.env
-    restart: unless-stopped
 
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
-    restart: always
-    env_file:
-      - src/.env
-    ports:
-      - "28081:8081"
-    depends_on:
-      - mongo
 
 #networks:
 #  movies-network:

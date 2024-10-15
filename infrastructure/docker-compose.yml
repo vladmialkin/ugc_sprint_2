@@ -9,7 +9,7 @@ services:
       - postgresql_initdb_data:/docker-entrypoint-initdb.d
     env_file:
       - .env
-    networks: 
+    networks:
       - movies-network
     restart: always
   
@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     networks:
-      -  movies-network
+      - movies-network
     restart: always
 
   elastic:
@@ -40,19 +40,19 @@ services:
     env_file:
       - env
     networks:
-      -  movies-network
+      - movies-network
     restart: always
 
   redis:
     image: redis:7.4.0
     container_name: movies-redis
     ports:
-        - "6379:6379"
+      - "6379:6379"
     volumes:
-        - redis_data:/data/
+      - redis_data:/data/
     command: redis-server --databases 2
     networks:
-      -  movies-network
+      - movies-network
     restart: always
 
   nginx:
@@ -64,7 +64,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/configs:/etc/nginx/conf.d:ro
     networks:
-      -  movies-network
+      - movies-network
     restart: always
 
   kafka:
@@ -148,6 +148,41 @@ services:
     networks:
       - movies-network
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    env_file:
+      - .env
+    networks:
+      - movies-network
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data
+    networks:
+      - movies-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "28081:8081"
+    depends_on:
+      - mongo
+    networks:
+      - movies-network
+
 volumes:
   kafka_data:
     name: kafka_data
@@ -191,6 +226,14 @@ volumes:
       type: none
       o: bind
       device: ./redis/data
+
+  mongo_data:
+    name: mongo_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./mongo/data
 
 networks:
   movies-network:
