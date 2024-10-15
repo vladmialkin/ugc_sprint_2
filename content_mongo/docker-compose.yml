@@ -1,0 +1,35 @@
+services:
+  content:
+    container_name: mongo-content
+    build: src
+    env_file:
+      - src/.env
+    restart: always
+    command: bash -c "
+      uvicorn app.main:app --host 0.0.0.0 --port 8001"
+#    networks:
+#      - movies-network
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - src/.env
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    env_file:
+      - src/.env
+    ports:
+      - "28081:8081"
+    depends_on:
+      - mongo
+
+#networks:
+#  movies-network:
+#    name: movies-network
+#    external: true
