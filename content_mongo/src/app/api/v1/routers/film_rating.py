@@ -13,10 +13,11 @@ router = APIRouter()
     "/",
     summary='Список всех рейтингов фильмов',
     description='Список всех рейтингов фильмов',
-    response_description='Выводит все рейтинги всех фильмов'
+    response_description='Выводит все рейтинги всех фильмов',
+    response_model=list[FilmRatingSchema]
 )
-async def get_all_film_rating(user: UserData):
-    return []
+async def get_all_film_rating(user: UserData) -> list[FilmRatingSchema]:
+    return await FilmRatingRepository().get_all()
 
 
 @router.get(
@@ -26,7 +27,7 @@ async def get_all_film_rating(user: UserData):
     response_description='Выводит рейтинг фильмов по id',
     response_model=FilmRatingSchema
 )
-async def get_one_film_rating(rating_id: UUID) -> FilmRatingSchema:
+async def get_one_film_rating(rating_id: UUID, user: UserData) -> FilmRatingSchema:
     return await FilmRatingRepository().get(data=rating_id)
 
 
@@ -34,10 +35,11 @@ async def get_one_film_rating(rating_id: UUID) -> FilmRatingSchema:
     "/",
     summary='Создание рейтинга фильмов',
     description='Создание рейтинга фильмов',
-    response_description='Создание рейтинга фильмов'
+    response_description='Создание рейтинга фильмов',
+    response_model=FilmRatingSchema,
 )
-async def create_film_rating(data: FilmRatingSchema):
-    return await FilmRatingRepository().create(data)
+async def create_film_rating(data: FilmRatingSchema, user: UserData) -> FilmRatingSchema:
+    return await FilmRatingRepository().create(data=data)
 
 
 @router.put(
@@ -46,9 +48,8 @@ async def create_film_rating(data: FilmRatingSchema):
     description='Изменение рейтинга фильмов по id',
     response_description='Изменение рейтинга фильмов по id'
 )
-async def update_film_rating(rating_id: UUID, user: UserData):
-    print(user)
-    return []
+async def update_film_rating(rating_id: UUID, data: FilmRatingSchema, user: UserData) -> FilmRatingSchema:
+    return await FilmRatingRepository().update(rating_id=rating_id, data=data)
 
 
 @router.delete(
@@ -57,5 +58,6 @@ async def update_film_rating(rating_id: UUID, user: UserData):
     description='Удаление рейтинга фильмов по id',
     response_description='Удаление рейтинга фильмов по id'
 )
-async def delete_film_rating(rating_id, user: UserData):
-    return []
+async def delete_film_rating(rating_id: UUID, user: UserData):
+    await FilmRatingRepository().delete(rating_id=rating_id)
+    return f"Рейтинг с id {rating_id} удалён."

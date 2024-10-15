@@ -1,0 +1,63 @@
+from uuid import UUID
+
+from fastapi import APIRouter
+
+from app.api.v1.deps.user import UserData
+from app.api.v1.schemas.film_bookmarks import FilmBookmarks as FilmBookmarksSchema
+from app.repositories.film_bookmarks import FilmBookmarksRepository
+
+router = APIRouter()
+
+
+@router.get(
+    "/",
+    summary='Список всех закладок фильмов',
+    description='Список всех закладок фильмов',
+    response_description='Выводит все закладки фильмов',
+    response_model=list[FilmBookmarksSchema]
+)
+async def get_all_film_bookmarks(user: UserData) -> list[FilmBookmarksSchema]:
+    return await FilmBookmarksRepository().get_all()
+
+
+@router.get(
+    "/{bookmarks_id}",
+    summary='Поиск закладок фильмов по id',
+    description='Выводит закладки фильмов по id',
+    response_description='Выводит закладок фильмов по id',
+    response_model=FilmBookmarksSchema
+)
+async def get_one_film_bookmarks(bookmark_id: UUID, user: UserData) -> FilmBookmarksSchema:
+    return await FilmBookmarksRepository().get(data=bookmark_id)
+
+
+@router.post(
+    "/",
+    summary='Создание закладок фильмов',
+    description='Создание закладок фильмов',
+    response_description='Создание закладок фильмов',
+    response_model=FilmBookmarksSchema,
+)
+async def create_film_bookmarks(data: FilmBookmarksSchema, user: UserData) -> FilmBookmarksSchema:
+    return await FilmBookmarksRepository().create(data=data)
+
+
+@router.put(
+    "/{bookmarks_id}",
+    summary='Изменение закладок фильмов по id',
+    description='Изменение закладок фильмов по id',
+    response_description='Изменение закладок фильмов по id'
+)
+async def update_film_bookmarks(bookmark_id: UUID, data: FilmBookmarksSchema, user: UserData) -> FilmBookmarksSchema:
+    return await FilmBookmarksRepository().update(bookmark_id=bookmark_id, data=data)
+
+
+@router.delete(
+    "/{bookmarks_id}",
+    summary='Удаление закладок фильмов по id',
+    description='Удаление закладок фильмов по id',
+    response_description='Удаление закладок фильмов по id'
+)
+async def delete_film_bookmarks(bookmark_id: UUID, user: UserData):
+    await FilmBookmarksRepository().delete(bookmark_id=bookmark_id)
+    return f"Закладки фильмов с id {bookmark_id} удалёны."
