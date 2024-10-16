@@ -16,7 +16,7 @@ from app.models.film_bookmarks import FilmBookmarks
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     client = AsyncIOMotorClient(mongo_settings.DSN)
-    await init_beanie(database=client.db_name, document_models=[FilmRating, FilmReviews, FilmBookmarks])
+    await init_beanie(database=client.test, document_models=[FilmRating, FilmReviews, FilmBookmarks])
     yield
     client.close()
 

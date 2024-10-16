@@ -16,7 +16,7 @@ router = APIRouter()
     response_description='Выводит все комментарии ко всем фильмам',
     response_model=list[FilmReviewsSchema]
 )
-async def get_all_film_reviews() -> list[FilmReviewsSchema]:
+async def get_all_film_reviews(user: UserData) -> list[FilmReviewsSchema]:
     return await film_reviews_repository.all_list()
 
 
@@ -27,7 +27,7 @@ async def get_all_film_reviews() -> list[FilmReviewsSchema]:
     response_description='Выводит рейтинг фильмов по id',
     response_model=FilmReviewsSchema
 )
-async def get_one_film_reviews(reviews_id: UUID) -> FilmReviewsSchema:
+async def get_one_film_reviews(reviews_id: UUID, user: UserData) -> FilmReviewsSchema:
     return await film_reviews_repository.get(item_id=reviews_id)
 
 
@@ -38,7 +38,7 @@ async def get_one_film_reviews(reviews_id: UUID) -> FilmReviewsSchema:
     response_description='Создание комментария к фильму',
     response_model=FilmReviewsSchema,
 )
-async def create_film_reviews(data: FilmReviewsSchema) -> FilmReviewsSchema:
+async def create_film_reviews(data: FilmReviewsSchema, user: UserData) -> FilmReviewsSchema:
     return await film_reviews_repository.create(data=dict(data))
 
 
@@ -48,7 +48,7 @@ async def create_film_reviews(data: FilmReviewsSchema) -> FilmReviewsSchema:
     description='Изменение комментария к фильму по id',
     response_description='Изменение комментария к фильму по id'
 )
-async def update_film_reviews(reviews_id: UUID, data: FilmReviewsSchema) -> FilmReviewsSchema:
+async def update_film_reviews(reviews_id: UUID, data: FilmReviewsSchema, user: UserData) -> FilmReviewsSchema:
     return await film_reviews_repository.update(item_id=reviews_id, data=dict(data))
 
 
@@ -58,16 +58,6 @@ async def update_film_reviews(reviews_id: UUID, data: FilmReviewsSchema) -> Film
     description='Удаление комментария к фильму по id',
     response_description='Удаление комментария к фильму по id'
 )
-async def delete_film_reviews(reviews_id: UUID):
+async def delete_film_reviews(reviews_id: UUID, user: UserData):
     await film_reviews_repository.delete(item_id=reviews_id)
     return f"Комментарий к фильму с id {reviews_id} удалён."
-
-
-@router.get(
-    "/filter",
-    summary='Фильтр комментариев к фильмам',
-    description='Позволяет фильтровать комментарии к фильмам по заданным параметрам',
-    response_model=list[FilmReviewsSchema]
-)
-async def filter_film_reviews(filters: FilmReviewsSchema) -> list[FilmReviewsSchema]:
-    return await film_reviews_repository.filter(dict(filters))

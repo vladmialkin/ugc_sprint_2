@@ -61,13 +61,3 @@ async def update_film_bookmarks(bookmark_id: UUID, data: FilmBookmarksSchema, us
 async def delete_film_bookmarks(bookmark_id: UUID, user: UserData):
     await film_bookmarks_repository.delete(item_id=bookmark_id)
     return f"Закладки фильмов с id {bookmark_id} удалёны."
-
-
-@router.get(
-    "/filter",
-    summary='Фильтр закладок фильмов',
-    description='Позволяет фильтровать закладки фильмов по заданным параметрам',
-    response_model=list[FilmBookmarksSchema]
-)
-async def filter_film_rating(filters: FilmBookmarksSchema, user: UserData) -> list[FilmBookmarksSchema]:
-    return await film_bookmarks_repository.filter(dict(filters))

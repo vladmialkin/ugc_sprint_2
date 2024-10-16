@@ -61,13 +61,3 @@ async def update_film_rating(rating_id: UUID, data: FilmRatingSchema, user: User
 async def delete_film_rating(rating_id: UUID, user: UserData):
     await film_rating_repository.delete(item_id=rating_id)
     return f"Рейтинг с id {rating_id} удалён."
-
-
-@router.get(
-    "/filter",
-    summary='Фильтр рейтинга фильмов',
-    description='Позволяет фильтровать рейтинг фильмов по заданным параметрам',
-    response_model=list[FilmRatingSchema]
-)
-async def filter_film_rating(filters: FilmRatingSchema, user: UserData) -> list[FilmRatingSchema]:
-    return await film_rating_repository.filter(dict(filters))

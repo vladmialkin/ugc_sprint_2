@@ -61,7 +61,7 @@ class BeanieBaseRepository[T]:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def filter(self, **attrs) -> List[T]:
+    async def filter(self, attrs) -> List[T]:
         try:
             return await self._collection.find(**attrs).to_list()
         except Exception as e:
