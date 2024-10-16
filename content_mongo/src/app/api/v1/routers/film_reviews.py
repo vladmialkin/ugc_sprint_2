@@ -3,7 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.api.v1.deps.user import UserData
-from app.api.v1.schemas.film_reviews import FilmReviews as FilmReviewsSchema
+from app.api.v1.schemas.film_reviews import FilmReviews as FilmReviewsSchema, \
+    OutputFilmReviews as OutputFilmReviewsSchema
 from app.repositories.film_reviews import film_reviews_repository
 
 router = APIRouter()
@@ -36,9 +37,9 @@ async def get_one_film_reviews(reviews_id: UUID, user: UserData) -> FilmReviewsS
     summary='Создание комментария к фильму',
     description='Создание комментария к фильму',
     response_description='Создание комментария к фильму',
-    response_model=FilmReviewsSchema,
+    response_model=OutputFilmReviewsSchema,
 )
-async def create_film_reviews(data: FilmReviewsSchema, user: UserData) -> FilmReviewsSchema:
+async def create_film_reviews(data: FilmReviewsSchema) -> OutputFilmReviewsSchema:
     return await film_reviews_repository.create(data=dict(data))
 
 

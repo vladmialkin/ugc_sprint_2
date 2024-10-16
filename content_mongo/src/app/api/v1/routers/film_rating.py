@@ -38,7 +38,7 @@ async def get_one_film_rating(rating_id: UUID, user: UserData) -> FilmRatingSche
     response_description='Создание рейтинга фильмов',
     response_model=FilmRatingSchema,
 )
-async def create_film_rating(data: FilmRatingSchema, user: UserData) -> FilmRatingSchema:
+async def create_film_rating(data: FilmRatingSchema) -> FilmRatingSchema:
     return await film_rating_repository.create(data=dict(data))
 
 
