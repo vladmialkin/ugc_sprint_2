@@ -5,6 +5,6 @@ from pydantic import Field
 
 
 class FilmRating(Base):
-    number: int = Field(le=10, ge=0)
-    film_id: UUID
-    user_id: UUID
+    number: int | None = Field(le=10, ge=0, description="Оценка")
+    film_id: UUID | None = Field(None, description="ID фильма")
+    user_id: UUID | None = Field(None, description="ID пользователя")
