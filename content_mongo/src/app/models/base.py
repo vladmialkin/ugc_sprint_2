@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from beanie import Document
+from bson import ObjectId
 from pydantic import Field
 
 

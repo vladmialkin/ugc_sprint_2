@@ -1,11 +1,9 @@
-from uuid import UUID
-
 from fastapi import APIRouter
 
+from app.models import FilmBookmarks as FilmBookmarksDocument
+from beanie import PydanticObjectId
+
 from app.api.v1.deps.user import UserData
-from app.api.v1.schemas.film_bookmarks import (
-    FilmBookmarks as FilmBookmarksSchema,
-)
 from app.repositories.film_bookmarks import film_bookmarks_repository
 
 router = APIRouter()
@@ -16,9 +14,9 @@ router = APIRouter()
     summary="Список всех закладок фильмов",
     description="Список всех закладок фильмов",
     response_description="Выводит все закладки фильмов",
-    response_model=list[FilmBookmarksSchema],
+    response_model=list[FilmBookmarksDocument],
 )
-async def get_all_film_bookmarks(user: UserData) -> list[FilmBookmarksSchema]:
+async def get_all_film_bookmarks(user: UserData) -> list[FilmBookmarksDocument]:
     return await film_bookmarks_repository.all_list()
 
 
@@ -27,12 +25,12 @@ async def get_all_film_bookmarks(user: UserData) -> list[FilmBookmarksSchema]:
     summary="Поиск закладок фильмов по id",
     description="Выводит закладки фильмов по id",
     response_description="Выводит закладок фильмов по id",
-    response_model=FilmBookmarksSchema,
+    response_model=FilmBookmarksDocument,
 )
 async def get_one_film_bookmarks(
-    bookmark_id: UUID, user: UserData
-) -> FilmBookmarksSchema:
-    return await film_bookmarks_repository.get(id=bookmark_id)
+        bookmark_id: PydanticObjectId, user: UserData
+) -> FilmBookmarksDocument:
+    return await film_bookmarks_repository.get(item_id=bookmark_id)
 
 
 @router.post(
@@ -40,11 +38,11 @@ async def get_one_film_bookmarks(
     summary="Создание закладок фильмов",
     description="Создание закладок фильмов",
     response_description="Создание закладок фильмов",
-    response_model=FilmBookmarksSchema,
+    response_model=FilmBookmarksDocument,
 )
 async def create_film_bookmarks(
-    data: FilmBookmarksSchema, user: UserData
-) -> FilmBookmarksSchema:
+        data: FilmBookmarksDocument, user: UserData
+) -> FilmBookmarksDocument:
     return await film_bookmarks_repository.create(data=dict(data))
 
 
@@ -53,10 +51,11 @@ async def create_film_bookmarks(
     summary="Изменение закладок фильмов по id",
     description="Изменение закладок фильмов по id",
     response_description="Изменение закладок фильмов по id",
+    response_model=FilmBookmarksDocument
 )
 async def update_film_bookmarks(
-    bookmark_id: UUID, data: FilmBookmarksSchema, user: UserData
-) -> FilmBookmarksSchema:
+        bookmark_id: PydanticObjectId, data: FilmBookmarksDocument, user: UserData
+) -> FilmBookmarksDocument:
     return await film_bookmarks_repository.update(
         item_id=bookmark_id, data=dict(data)
     )
@@ -68,6 +67,6 @@ async def update_film_bookmarks(
     description="Удаление закладок фильмов по id",
     response_description="Удаление закладок фильмов по id",
 )
-async def delete_film_bookmarks(bookmark_id: UUID, user: UserData):
+async def delete_film_bookmarks(bookmark_id: PydanticObjectId, user: UserData):
     await film_bookmarks_repository.delete(item_id=bookmark_id)
     return f"Закладки фильмов с id {bookmark_id} удалёны."
