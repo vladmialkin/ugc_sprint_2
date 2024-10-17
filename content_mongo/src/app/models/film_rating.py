@@ -1,7 +1,9 @@
 from uuid import UUID
 
-from app.models.base import BaseDocument
+from bson import UuidRepresentation
 from pydantic import Field
+
+from app.models.base import BaseDocument
 
 
 class FilmRating(BaseDocument):
@@ -11,3 +13,4 @@ class FilmRating(BaseDocument):
 
     class Settings:
         collection = "rating"
+        uuid_representation = UuidRepresentation.STANDARD

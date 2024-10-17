@@ -1,4 +1,4 @@
-from typing import TypeVar, List
+from typing import TypeVar
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -36,7 +36,9 @@ class BeanieBaseRepository[T]:
             await item.insert()
             return item
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Error creating item: {str(e)}")
+            raise HTTPException(
+                status_code=400, detail=f"Error creating item: {str(e)}"
+            )
 
     async def update(self, item_id: UUID, data: dict) -> T | None:
         try:
@@ -48,7 +50,9 @@ class BeanieBaseRepository[T]:
             else:
                 raise HTTPException(status_code=404, detail="Item not found")
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Error updating item: {str(e)}")
+            raise HTTPException(
+                status_code=400, detail=f"Error updating item: {str(e)}"
+            )
 
     async def delete(self, item_id: UUID) -> bool:
         try:
@@ -61,7 +65,7 @@ class BeanieBaseRepository[T]:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def filter(self, attrs) -> List[T]:
+    async def filter(self, attrs) -> list[T]:
         try:
             return await self._collection.find(**attrs).to_list()
         except Exception as e:

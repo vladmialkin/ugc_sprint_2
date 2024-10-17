@@ -14,7 +14,7 @@ class MongoDBSettings(Settings):
     @field_validator("DSN", mode="before")
     @classmethod
     def assemble_dsn(
-            cls, _: str | None, info: FieldValidationInfo
+        cls, _: str | None, info: FieldValidationInfo
     ) -> MongoDsn:
         scheme = "mongodb"
         user = info.data["MONGODB_USER"]

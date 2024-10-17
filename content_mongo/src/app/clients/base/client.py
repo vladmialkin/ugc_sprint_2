@@ -2,15 +2,19 @@ import enum
 from json import JSONDecodeError
 from typing import Any
 
-from httpx import Response, codes, AsyncClient
-
-from .constants import CONNECTION_TIMEOUT, MAX_RETRIES
-from .exceptions import ResponseDecodeError, BadRequestError, UnauthorizedError, NotFoundError
-
+from httpx import AsyncClient, Response, codes
 from tenacity import (
     retry,
     stop_after_attempt,
     wait_random_exponential,
+)
+
+from .constants import CONNECTION_TIMEOUT, MAX_RETRIES
+from .exceptions import (
+    BadRequestError,
+    NotFoundError,
+    ResponseDecodeError,
+    UnauthorizedError,
 )
 
 
@@ -24,10 +28,7 @@ class HTTPMethods(enum.StrEnum):
 
 class BaseClient:
     def __init__(
-            self,
-            base_url: str,
-            *args,
-            headers: dict[str, Any] | None = None
+        self, base_url: str, *args, headers: dict[str, Any] | None = None
     ):
         self._base_url = base_url
         self._headers = headers
@@ -60,32 +61,29 @@ class BaseClient:
         reraise=True,
     )
     async def _make_request(
-            self,
-            method: HTTPMethods,
-            url: str,
-            headers: dict | None = None,
-            **kwargs,
+        self,
+        method: HTTPMethods,
+        url: str,
+        headers: dict | None = None,
+        **kwargs,
     ):
         async with AsyncClient(
-                base_url=self._base_url,
-                headers=self._headers,
-                timeout=CONNECTION_TIMEOUT,
+            base_url=self._base_url,
+            headers=self._headers,
+            timeout=CONNECTION_TIMEOUT,
         ) as client:
             response = await client.request(
-                method=method,
-                url=url,
-                headers=headers,
-                **kwargs
+                method=method, url=url, headers=headers, **kwargs
             )
             return self._handle_response(response)
 
     async def _get(
-            self,
-            *,
-            url: str,
-            params: dict | None = None,
-            headers: dict | None = None,
-            **kwargs,
+        self,
+        *,
+        url: str,
+        params: dict | None = None,
+        headers: dict | None = None,
+        **kwargs,
     ):
         return await self._make_request(
             method=HTTPMethods.GET,
@@ -96,12 +94,12 @@ class BaseClient:
         )
 
     async def _post(
-            self,
-            *,
-            url: str,
-            json: dict | list | None = None,
-            headers: dict | None = None,
-            **kwargs,
+        self,
+        *,
+        url: str,
+        json: dict | list | None = None,
+        headers: dict | None = None,
+        **kwargs,
     ):
         return await self._make_request(
             method=HTTPMethods.POST,
@@ -112,12 +110,12 @@ class BaseClient:
         )
 
     async def _patch(
-            self,
-            *,
-            url: str,
-            params: dict | None = None,
-            json: dict | list | None = None,
-            **kwargs,
+        self,
+        *,
+        url: str,
+        params: dict | None = None,
+        json: dict | list | None = None,
+        **kwargs,
     ):
         return await self._make_request(
             method=HTTPMethods.PATCH,
@@ -128,12 +126,12 @@ class BaseClient:
         )
 
     async def _put(
-            self,
-            *,
-            url: str,
-            json: dict | list | None = None,
-            headers: dict | None = None,
-            **kwargs,
+        self,
+        *,
+        url: str,
+        json: dict | list | None = None,
+        headers: dict | None = None,
+        **kwargs,
     ):
         return await self._make_request(
             method=HTTPMethods.PUT,
@@ -144,12 +142,12 @@ class BaseClient:
         )
 
     async def _delete(
-            self,
-            *,
-            url: str,
-            params: dict | None = None,
-            json: dict | list | None = None,
-            **kwargs,
+        self,
+        *,
+        url: str,
+        params: dict | None = None,
+        json: dict | list | None = None,
+        **kwargs,
     ):
         return await self._make_request(
             method=HTTPMethods.DELETE,

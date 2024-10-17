@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from bson import UuidRepresentation, Binary
+from beanie import Link
+from bson import UuidRepresentation
 
 from app.models.base import BaseDocument
 from app.models.film_rating import FilmRating
-from beanie import Link
 
 
 class FilmReviews(BaseDocument):
@@ -15,3 +15,4 @@ class FilmReviews(BaseDocument):
 
     class Settings:
         collection = "reviews"
+        uuid_representation = UuidRepresentation.STANDARD

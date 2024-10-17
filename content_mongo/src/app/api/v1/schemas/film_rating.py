@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from app.api.v1.schemas.base import Base
 from pydantic import Field
+
+from app.api.v1.schemas.base import Base
 
 
 class FilmRating(Base):
