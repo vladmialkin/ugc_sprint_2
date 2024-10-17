@@ -55,6 +55,8 @@ async def test_create_film_reviews():
 
     film_rating = FilmRating(number=1, film_id=film_id, user_id=author_id)
 
+    await film_rating.insert()
+
     assert film_rating is not None
 
     film_reviews = FilmReviews(
@@ -66,11 +68,11 @@ async def test_create_film_reviews():
     await film_reviews.insert(link_rule=WriteRules.WRITE)
 
     film_reviews.text = "Новый текст"
-    await film_rating.save()
+    await film_reviews.save()
 
     updated_film_reviews = await FilmReviews.get(film_reviews.id)
 
-    assert updated_film_reviews.type == "Новый текст"
+    assert updated_film_reviews.text == "Новый текст"
 
 
 @pytest.mark.asyncio
@@ -100,7 +102,7 @@ async def test_delete_film_reviews():
     )
     await film_reviews.insert(link_rule=WriteRules.WRITE)
 
-    deleted_film_reviews = await FilmReviews.get(film_rating.id)
+    deleted_film_reviews = await FilmReviews.get(film_reviews.id)
 
     assert deleted_film_reviews is not None
 
