@@ -44,26 +44,26 @@ def timeit(func):
 
 @timeit
 async def get_rating_user(user_id: UUID):
-    value = await FilmRating.find(FilmRating.user_id == user_id).to_list()
-    logger.info(f"{value}")
+    ratings = await FilmRating.find(FilmRating.user_id == user_id).to_list()
+    logger.info(f"Рейтинги пользователя {user_id}: {ratings}")
 
 
 @timeit
 async def get_rating_film(rating: int):
-    value = await FilmRating.find(FilmRating.number == rating).to_list()
-    logger.info(f"Количество полученных элементов: {len(value)}")
+    ratings = await FilmRating.find(FilmRating.number == rating).to_list()
+    logger.info(f"Количество полученных элементов с рейтингом {rating}: {len(ratings)}")
 
 
 @timeit
 async def get_bookmarks_list():
-    value = await FilmRating.find().to_list()
-    logger.info(f"Количество полученных элементов: {len(value)}")
+    bookmarks = await FilmRating.find().to_list()
+    logger.info(f"Количество полученных закладок: {len(bookmarks)}")
 
 
 @timeit
-async def get_avg_rating(film_id: UUID):
-    value = await FilmRating.find(FilmRating.film_id == film_id).avg(FilmRating.number)
-    logger.info(f"Средний рейтинг фильма: {value}")
+async def get_avg_rating(film_id: str):
+    average_rating = await FilmRating.find(FilmRating.film_id == film_id).avg(FilmRating.number) or 0
+    logger.info(f"Средний рейтинг фильма {film_id}: {average_rating}")
 
 
 async def insert_records(batch_size, count):
@@ -120,20 +120,17 @@ async def main(total_records, batch_size):
         document_models=[FilmBookmarks, FilmReviews, FilmRating],
     )
 
-    await insert_to_db(total_records, batch_size)
+    # await insert_to_db(total_records, batch_size)
 
     tasks = []
 
     tasks.append(get_rating_user(user_id=UUID("f1fa9b48-8d33-11ef-a341-7c70db5559dd")))
-    await asyncio.gather(*tasks)
 
     tasks.append(get_rating_film(rating=4))
-    await asyncio.gather(*tasks)
 
     tasks.append(get_bookmarks_list())
-    await asyncio.gather(*tasks)
 
-    tasks.append(get_avg_rating(film_id=UUID("f1fa9bb6-8d33-11ef-a341-7c70db5559dd")))
+    tasks.append(get_avg_rating(film_id="9b5104d8-8d49-11ef-ad95-7c70db5559dd"))
     await asyncio.gather(*tasks)
 
 
