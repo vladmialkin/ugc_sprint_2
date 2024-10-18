@@ -29,7 +29,7 @@ async def lifespan(_: FastAPI):
     await postgresql.async_engine.dispose()
 
 
-configure_tracer()
+# configure_tracer()
 
 app = FastAPI(
     title=api_settings.TITLE,
@@ -40,19 +40,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-FastAPIInstrumentor.instrument_app(app)
+# FastAPIInstrumentor.instrument_app(app)
 
 
-@app.middleware("http")
-async def before_request(request: Request, call_next):
-    response = await call_next(request)
-    request_id = request.headers.get("X-Request-Id")
-    if not request_id:
-        return ORJSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": "X-Request-Id is required"},
-        )
-    return response
+# @app.middleware("http")
+# async def before_request(request: Request, call_next):
+#     response = await call_next(request)
+#     request_id = request.headers.get("X-Request-Id")
+#     if not request_id:
+#         return ORJSONResponse(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             content={"detail": "X-Request-Id is required"},
+#         )
+#     return response
 
 
 app.include_router(v1_router)
