@@ -37,6 +37,18 @@ jobs:
         name: flake8-html-report-${{ matrix.python-version }}
         path: flake8-report-${{ matrix.python-version }}/
 
+    - name: Run mypy and generate txt report
+      run: |
+        mkdir -p mypy-report-${{ matrix.python-version }}
+        mypy --config-file mypy.ini . > mypy-report-${{ matrix.python-version }}/mypy-txt-report.txt
+
+    - name: Upload mypy txt report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: mypy-txt-report-${{ matrix.python-version }}
+        path: mypy-report-${{ matrix.python-version }}
+
   notify:
     runs-on: ubuntu-latest
     needs: build
