@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 from app.models import FilmBookmarks as FilmBookmarksDocument
 from beanie import PydanticObjectId
@@ -66,7 +66,7 @@ async def update_film_bookmarks(
     summary="Удаление закладок фильмов по id",
     description="Удаление закладок фильмов по id",
     response_description="Удаление закладок фильмов по id",
+    status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_film_bookmarks(bookmark_id: PydanticObjectId, user: UserData):
     await film_bookmarks_repository.delete(item_id=bookmark_id)
-    return f"Закладки фильмов с id {bookmark_id} удалёны."

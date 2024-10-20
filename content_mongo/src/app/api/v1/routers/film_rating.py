@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 from app.api.v1.deps.user import UserData
 from beanie import PydanticObjectId
@@ -63,7 +63,7 @@ async def update_film_rating(
     summary="Удаление рейтинга фильмов по id",
     description="Удаление рейтинга фильмов по id",
     response_description="Удаление рейтинга фильмов по id",
+    status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_film_rating(rating_id: PydanticObjectId, user: UserData):
     await film_rating_repository.delete(item_id=rating_id)
-    return f"Рейтинг с id {rating_id} удалён."

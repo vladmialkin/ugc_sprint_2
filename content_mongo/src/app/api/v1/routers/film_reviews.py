@@ -1,5 +1,5 @@
 from beanie import PydanticObjectId
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 from app.api.v1.deps.user import UserData
 from app.api.v1.schemas.film_reviews import FilmReviews as FilmReviewsSchema
@@ -23,9 +23,9 @@ async def get_all_film_reviews(user: UserData) -> list[FilmReviewsDocument]:
 
 @router.get(
     "/{reviews_id}",
-    summary="Поиск рейтинга фильмов по id",
-    description="Выводит рейтинг фильмов по id",
-    response_description="Выводит рейтинг фильмов по id",
+    summary="Поиск комментария к фильму по id",
+    description="Выводит комментарий к фильму по id",
+    response_description="Выводит комментарий к фильму по id",
     response_model=FilmReviewsDocument,
 )
 async def get_one_film_reviews(
@@ -66,7 +66,7 @@ async def update_film_reviews(
     summary="Удаление комментария к фильму по id",
     description="Удаление комментария к фильму по id",
     response_description="Удаление комментария к фильму по id",
+    status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_film_reviews(reviews_id: PydanticObjectId, user: UserData):
     await film_reviews_repository.delete(item_id=reviews_id)
-    return f"Комментарий к фильму с id {reviews_id} удалён."
