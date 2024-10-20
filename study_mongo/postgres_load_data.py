@@ -79,22 +79,22 @@ async def get_rating_user(session: AsyncSession, user_id: str):
 
 
 @timeit
-async def get_rating_film(session: AsyncSession, rating: int):
-    result = await session.execute(select(FilmRating).where(FilmRating.number == rating))
+async def get_rating_film(session: AsyncSession, rating: int, film_id: str):
+    result = await session.execute(select(FilmRating).where(FilmRating.number == rating, FilmRating.film_id == film_id))
     ratings = result.scalars().all()
-    logger.info(f"Количество полученных элементов с рейтингом {rating}: {len(ratings)}")
+    logger.info(f"Количество полученных элементов фильма {film_id} с рейтингом {rating}: {len(ratings)}")
 
 
 @timeit
-async def get_bookmarks_list(session: AsyncSession):
-    result = await session.execute(select(FilmBookmarks))
-    bookmarks = result.scalars().all()
-    logger.info(f"Количество полученных закладок: {len(bookmarks)}")
+async def get_bookmarks_count(session: AsyncSession):
+    result = await session.execute(select(func.count()).select_from(FilmBookmarks))
+    count = result.scalar()
+    logger.info(f"Количество полученных закладок: {count}")
 
 
 @timeit
-async def get_avg_rating(session: AsyncSession, film_id: UUID):
-    result = await session.execute(select(func.avg(FilmRating.number)).where(FilmRating.film_id == str(film_id)))
+async def get_avg_rating(session: AsyncSession, film_id: str):
+    result = await session.execute(select(func.avg(FilmRating.number)).where(FilmRating.film_id == film_id))
     average_rating = result.scalar() or 0
     logger.info(f"Средний рейтинг фильма {film_id}: {average_rating}")
 
@@ -145,6 +145,10 @@ async def insert_to_db(session: AsyncSession, total_records, batch_size):
 
     for _ in range(total_records // batch_size):
         await insert_records(session, batch_size)
+        await get_rating_user(session, user_id="9b5103de-8d49-11ef-ad95-7c70db5559dd")
+        await get_rating_film(session, rating=8, film_id="f1fa9b48-8d33-11ef-a341-7c70db5559dd")
+        await get_bookmarks_count(session)
+        await get_avg_rating(session, film_id="f1fa9b48-8d33-11ef-a341-7c70db5559dd")
 
     logger.info(f"Затраченное время {(time.time() - start_time) / 60} минут")
 
@@ -157,11 +161,11 @@ async def main(total_records, batch_size):
         await conn.run_sync(Base.metadata.create_all)
 
     async with async_session() as session:
-        # await insert_to_db(session, total_records, batch_size)
+        await insert_to_db(session, total_records, batch_size)
 
         await get_rating_user(session, user_id="9b5103de-8d49-11ef-ad95-7c70db5559dd")
         await get_rating_film(session, rating=8)
-        await get_bookmarks_list(session)
+        await get_bookmarks_count(session)
         await get_avg_rating(session, film_id=UUID("f1fa9b48-8d33-11ef-a341-7c70db5559dd"))
 
 
@@ -185,5 +189,5 @@ if __name__ == "__main__":
     batch_size = 1000
     num_process = 5
     DATABASE_URL = "postgresql+asyncpg://user:123425426edfe@localhost/postgres_db"
-    run_async_process(total_records, batch_size)
-    # run_multiprocessing(total_records, batch_size, num_process)
+    # run_async_process(total_records, batch_size)
+    run_multiprocessing(total_records, batch_size, num_process)
