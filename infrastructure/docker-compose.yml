@@ -9,9 +9,14 @@ services:
       - postgresql_initdb_data:/docker-entrypoint-initdb.d
     env_file:
       - .env
-    networks:
+    networks: 
       - movies-network
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   
   pgadmin:
     image: dpage/pgadmin4
@@ -23,12 +28,18 @@ services:
     env_file:
       - .env
     networks:
-      - movies-network
+      -  movies-network
     restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      start_period: 160s
+      retries: 3
 
-  elastic:
+  elasticsearch:
     image: elasticsearch:8.15.2
-    container_name: movies-elastic
+    container_name: movies-elasticsearch
     ulimits:
       memlock:
         soft: -1
@@ -38,22 +49,66 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     env_file:
-      - env
+      - .env
+    networks:
+      -  movies-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: kibana:8.15.2
+    container_name: movies-kibana
+    ports:
+      - "5601:5601"
+    env_file:
+      - .env
+    networks:
+      - movies-network
+    depends_on:
+      - elasticsearch
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601/app/kibana"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  logstash:
+    image: logstash:8.15.2
+    container_name: movies-logstash
+    ports:
+      - "5044:5044"
+    volumes:
+      - logstash_data:/usr/share/logstash/pipeline
     networks:
       - movies-network
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   redis:
     image: redis:7.4.0
     container_name: movies-redis
     ports:
-      - "6379:6379"
+        - "6379:6379"
     volumes:
-      - redis_data:/data/
+        - redis_data:/data/
     command: redis-server --databases 2
     networks:
-      - movies-network
+      -  movies-network
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:1.27.1
@@ -63,9 +118,30 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/configs:/etc/nginx/conf.d:ro
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      -  movies-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  filebeat:
+    image: elastic/filebeat:8.15.2
+    container_name: movies-filebeat
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./nginx/logs:/var/log/nginx
+    restart: always
     networks:
       - movies-network
-    restart: always
+    healthcheck:
+      test: ["CMD", "pidof", "filebeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   kafka:
     image: bitnami/kafka:latest
@@ -74,34 +150,50 @@ services:
       - "9094:9094"
     volumes:
       - kafka_data:/bitnami/kafka/data
-    environment:
     env_file:
       - .env
     networks:
       - movies-network
     restart: always
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9094", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   zookeeper:
     image: zookeeper:3.8
-    container_name: zookeeper
+    container_name: movies-zookeeper
     hostname: zookeeper
     networks:
       - movies-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "zkCli.sh", "-server", "localhost:2181", "ls", "/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-  clickhouse-node1:
+  clickhouse:
     image: clickhouse/clickhouse-server:23
-    container_name: clickhouse-node1
+    container_name: movies-clickhouse-node1
     hostname: clickhouse-node1
     ports:
       - "8123:8123"
       - "9000:9000"
     volumes:
-      - ./dbs/clickhouse/data/node1:/etc/clickhouse-server
-      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - clickhouse_node_1_data:/etc/clickhouse-server
+      - clickhouse_initdb_data:/docker-entrypoint-initdb.d
     depends_on:
       - zookeeper
     networks:
       - movies-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--host=localhost", "--query=SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   clickhouse-node2:
     image: clickhouse/clickhouse-server:23
@@ -212,6 +304,14 @@ volumes:
       type: none
       o: bind
       device: ./elasticsearch/data
+  logstash_data:
+    name: logstash_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./logstash/pipelines
+
   pgadmin_data:
     name: pgadmin_data
     driver: local
@@ -226,14 +326,34 @@ volumes:
       type: none
       o: bind
       device: ./redis/data
-
-  mongo_data:
-    name: mongo_data
+  clickhouse_node_1_data:
+    name: clickhouse_node_1_data
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./mongo/data
+      device: ./clickhouse/data/node_1
+  clickhouse_initdb_data:
+    name: clickhouse_initdb_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./clickhouse/initdb
+  nginx_conf:
+    name: nginx_conf
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./nginx/nginx.conf
+  nginx_site_configs:
+    name: nginx_site_configs
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./nginx/configs
 
 networks:
   movies-network:

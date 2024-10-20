@@ -43,9 +43,9 @@ def get_refresh_jwt_strategy() -> RefreshJWTStrategy:
         lifetime_seconds=jwt_settings.REFRESH_TOKEN_LIFETIME_SECONDS,
     )
 
-
-bearer_transport = RefreshableBearerTransport(tokenUrl="/api/auth/v1/jwt/login")
-
+bearer_transport = RefreshableBearerTransport(
+    tokenUrl="/api/auth/v1/jwt/login"
+)
 
 authentication_backend = RefreshableAuthenticationBackend(
     name="jwt",

@@ -14,6 +14,4 @@ router.include_router(
     user_role_router, prefix="/user_role", tags=["Роли пользователей"]
 )
 router.include_router(session_router, prefix="/sessions", tags=["Сессии"])
-router.include_router(
-    google_oauth_router, prefix="/oauth", tags=["OAuth"]
-)
+router.include_router(google_oauth_router, prefix="/oauth", tags=["OAuth"])

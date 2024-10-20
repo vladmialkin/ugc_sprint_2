@@ -10,4 +10,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 8089
+EXPOSE 8000
+
