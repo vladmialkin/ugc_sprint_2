@@ -1,0 +1,240 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: movies-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - postgresql_initdb_data:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+    networks:
+      - movies-network
+    restart: always
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: movies-pgadmin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    env_file:
+      - .env
+    networks:
+      - movies-network
+    restart: always
+
+  elastic:
+    image: elasticsearch:8.15.2
+    container_name: movies-elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    env_file:
+      - env
+    networks:
+      - movies-network
+    restart: always
+
+  redis:
+    image: redis:7.4.0
+    container_name: movies-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data/
+    command: redis-server --databases 2
+    networks:
+      - movies-network
+    restart: always
+
+  nginx:
+    image: nginx:1.27.1
+    container_name: movies-nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/configs:/etc/nginx/conf.d:ro
+    networks:
+      - movies-network
+    restart: always
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: movies-kafka
+    ports:
+      - "9094:9094"
+    volumes:
+      - kafka_data:/bitnami/kafka/data
+    environment:
+    env_file:
+      - .env
+    networks:
+      - movies-network
+    restart: always
+
+  zookeeper:
+    image: zookeeper:3.8
+    container_name: zookeeper
+    hostname: zookeeper
+    networks:
+      - movies-network
+
+  clickhouse-node1:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node1
+    hostname: clickhouse-node1
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node1:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  clickhouse-node2:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node2
+    hostname: clickhouse-node2
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node2:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  clickhouse-node3:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node3
+    hostname: clickhouse-node3
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node3:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  clickhouse-node4:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node4
+    hostname: clickhouse-node4
+    ports:
+      - "8126:8123"
+      - "9003:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node4:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    env_file:
+      - .env
+    networks:
+      - movies-network
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data
+    networks:
+      - movies-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "28081:8081"
+    depends_on:
+      - mongo
+    networks:
+      - movies-network
+
+volumes:
+  kafka_data:
+    name: kafka_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./kafka/data
+  postgresql_data:
+    name: postgresql_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./postgresql/data
+  postgresql_initdb_data:
+    name: postgresql_initdb_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./postgresql/initdb
+  elasticsearch_data:
+    name: elasticsearch_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./elasticsearch/data
+  pgadmin_data:
+    name: pgadmin_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./pgadmin/data
+  redis_data:
+    name: redis_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./redis/data
+
+  mongo_data:
+    name: mongo_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./mongo/data
+
+networks:
+  movies-network:
+    name: movies-network
