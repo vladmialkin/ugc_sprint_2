@@ -28,7 +28,6 @@ async def lifespan(_: FastAPI):
     await redis.redis_conn.close()
     await postgresql.async_engine.dispose()
 
-
 app = FastAPI(
     title=api_settings.TITLE,
     openapi_url=api_settings.OPENAPI_URL,
@@ -37,6 +36,5 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )
-
 
 app.include_router(v1_router)

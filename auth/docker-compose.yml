@@ -27,7 +27,6 @@ services:
       timeout: 10s
       retries: 3
 
-
 networks:
   movies-network:
     name: movies-network

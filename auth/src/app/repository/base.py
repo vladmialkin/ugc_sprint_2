@@ -21,7 +21,6 @@ class SQLAlchemyRepository[T]:
         self, session: AsyncSession, options: Any | None = None, **attrs
     ) -> T | None:
         query = select(self._model).filter_by(**attrs)
-
         if options is not None:
             if isinstance(options, list):
                 for option in options:

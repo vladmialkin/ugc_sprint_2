@@ -195,21 +195,87 @@ services:
       timeout: 10s
       retries: 3
 
+  clickhouse-node2:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node2
+    hostname: clickhouse-node2
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node2:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  clickhouse-node3:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node3
+    hostname: clickhouse-node3
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node3:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  clickhouse-node4:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node4
+    hostname: clickhouse-node4
+    ports:
+      - "8126:8123"
+      - "9003:9000"
+    volumes:
+      - ./dbs/clickhouse/data/node4:/etc/clickhouse-server
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    depends_on:
+      - zookeeper
+    networks:
+      - movies-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    env_file:
+      - .env
+    networks:
+      - movies-network
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data
+    networks:
+      - movies-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "28081:8081"
+    depends_on:
+      - mongo
+    networks:
+      - movies-network
+
 volumes:
-  nginx_conf:
-    name: nginx_conf
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./nginx/nginx.conf
-  nginx_site_configs:
-    name: nginx_site_configs
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./nginx/configs
   kafka_data:
     name: kafka_data
     driver: local
@@ -245,6 +311,7 @@ volumes:
       type: none
       o: bind
       device: ./logstash/pipelines
+
   pgadmin_data:
     name: pgadmin_data
     driver: local
@@ -273,6 +340,20 @@ volumes:
       type: none
       o: bind
       device: ./clickhouse/initdb
+  nginx_conf:
+    name: nginx_conf
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./nginx/nginx.conf
+  nginx_site_configs:
+    name: nginx_site_configs
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./nginx/configs
 
 networks:
   movies-network:
