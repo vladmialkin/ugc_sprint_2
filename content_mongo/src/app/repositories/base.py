@@ -40,11 +40,11 @@ class BeanieBaseRepository[T]:
                 status_code=400, detail=f"Error creating item: {str(e)}"
             )
 
-    async def update(self, item_id: UUID, data: dict) -> T | None:
+    async def update(self, item_id: UUID, data: T) -> T | None:
         try:
             existing_item = await self._collection.get(item_id)
             if existing_item:
-                updated_item = existing_item.copy(update=data)
+                updated_item = existing_item.copy(update=dict(data))
                 await updated_item.save()
                 return updated_item
             else:
