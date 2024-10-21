@@ -61,6 +61,7 @@ jobs:
     - name: Run tests with pytest
       if: env.tests_found == 'true'
       run: |
+        if [ -f tests.txt ]; then pip install -r tests.txt; fi
         pytest --maxfail=5 --disable-warnings
 
     - name: Notify if no tests found
