@@ -63,7 +63,7 @@ jobs:
       run: |
         find . -name 'main.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
-          pip install -r "$req_file"
+          pip install --no-deps -r "$req_file"
         done
         find . -name 'test.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
