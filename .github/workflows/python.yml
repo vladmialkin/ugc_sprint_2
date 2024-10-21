@@ -58,11 +58,21 @@ jobs:
 #        name: mypy-txt-report-${{ matrix.python-version }}
 #        path: mypy-report-${{ matrix.python-version }}
 
-    - name: Run tests with pytest
+    - name: Find and install all main.txt, test.txt files
       if: env.tests_found == 'true'
       run: |
-        if [ -f tests.txt ]; then pip install -r tests.txt; fi
-        pip install -r content_mongo/src/requirements/main.txt
+        find . -name 'main.txt' | while read req_file; do
+          echo "Installing dependencies from $req_file"
+          pip install -r "$req_file"
+        done
+        find . -name 'test.txt' | while read req_file; do
+          echo "Installing dependencies from $req_file"
+          pip install -r "$req_file"
+        done
+
+    - name: Run tests
+      if: env.tests_found == 'true'
+      run: |
         pytest --maxfail=5 --disable-warnings
 
     - name: Notify if no tests found
