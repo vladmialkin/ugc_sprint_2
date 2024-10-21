@@ -61,7 +61,7 @@ jobs:
     - name: Run tests with pytest
       if: env.tests_found == 'true'
       run: |
-        pytest -s -v
+        pytest --maxfail=5 --disable-warnings
 
     - name: Notify if no tests found
       if: env.tests_found == 'false'
