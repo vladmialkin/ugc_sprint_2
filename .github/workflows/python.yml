@@ -24,7 +24,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f ci_cd_requirements.txt ]; then pip install -r ci_cd_requirements.txt; fi
-        if test_*.py 1 > /dev/null 2>&1; then
+
+    - name: Check if tests exist
+      run: |
+        if find . -name 'test_*.py' | grep .; then
           echo "tests_found=true" >> $GITHUB_ENV
         else
           echo "tests_found=false" >> $GITHUB_ENV
