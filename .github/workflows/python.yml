@@ -56,7 +56,7 @@ jobs:
 #        path: mypy-report-${{ matrix.python-version }}
 
     - name: Run tests with pytest
-      if: env.tests_found== "true"
+      if: env.tests_found == 'true'
       run: |
         pytest -s -v
 
