@@ -62,6 +62,7 @@ jobs:
       if: env.tests_found == 'true'
       run: |
         if [ -f tests.txt ]; then pip install -r tests.txt; fi
+        pip install -r content_mongo/src/requirements/main.txt
         pytest --maxfail=5 --disable-warnings
 
     - name: Notify if no tests found
