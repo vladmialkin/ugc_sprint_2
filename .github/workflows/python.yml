@@ -80,7 +80,7 @@ jobs:
     - name: Load .env variables
       if: always()
       run: |
-         export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+        export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
         for var in $(cat .env | grep -v '#' | awk '/=/ {print $1}'); do
           echo "$var=${!var}" >> $GITHUB_ENV
         done
