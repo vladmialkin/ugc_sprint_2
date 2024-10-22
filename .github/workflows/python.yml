@@ -71,6 +71,7 @@ jobs:
         done
 
     - name: Load .env variables
+      if: always()
       run: |
         find . -name '.env' | while read req_file; do
           export $(cat "$req_file" | grep -v '#' | awk '/=/ {print $1}')
@@ -80,12 +81,13 @@ jobs:
         done
 
     - name: Run tests
+      if: always()
       if: env.tests_found == 'true'
       run: |
         pytest --maxfail=5 --disable-warnings
 
     - name: Notify if no tests found
-      if: env.tests_found == 'false'
+      if: env.tests_found == 'false' && always()
       run: |
         echo "No tests were found in the repository."
 
