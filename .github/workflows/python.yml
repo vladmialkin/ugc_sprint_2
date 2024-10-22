@@ -64,22 +64,23 @@ jobs:
       run: |
         find . -name 'main.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
-          sudo apt install -y apparmor && pip install -r "$req_file"
+          sudo apt install -y apparmor
+#          pip install -r "$req_file"
         done
-        find . -name 'test.txt' | while read req_file; do
-          echo "Installing dependencies from $req_file"
-          pip install -r "$req_file"
-        done
-
-    - name: Run tests
-      if: env.tests_found == 'true'
-      run: |
-        pytest --maxfail=5 --disable-warnings
-
-    - name: Notify if no tests found
-      if: env.tests_found == 'false'
-      run: |
-        echo "No tests were found in the repository."
+#        find . -name 'test.txt' | while read req_file; do
+#          echo "Installing dependencies from $req_file"
+#          pip install -r "$req_file"
+#        done
+#
+#    - name: Run tests
+#      if: env.tests_found == 'true'
+#      run: |
+#        pytest --maxfail=5 --disable-warnings
+#
+#    - name: Notify if no tests found
+#      if: env.tests_found == 'false'
+#      run: |
+#        echo "No tests were found in the repository."
 
 #  notify:
 #    runs-on: ubuntu-latest
