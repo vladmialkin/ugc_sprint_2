@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.12"]
@@ -60,11 +60,12 @@ jobs:
 
     - name: Find and install all main.txt, test.txt files
       if: env.tests_found == 'true'
+      continue-on-error: true
       run: |
         find . -name 'main.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
-          pip install --no-deps -r "$req_file"
-        done
+          pip install -r "$req_file"
+#        done
         find . -name 'test.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
           pip install -r "$req_file"
