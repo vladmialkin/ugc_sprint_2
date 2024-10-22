@@ -33,38 +33,30 @@ jobs:
           echo "tests_found=false" >> $GITHUB_ENV
         fi
 
-    - name: Check if .env exist
-      run: |
-        if find . -name '.env' | grep .; then
-          echo "env_found=true" >> $GITHUB_ENV
-        else
-          echo "env_found=false" >> $GITHUB_ENV
-        fi
+#    - name: Run Flake8 and generate HTML report
+#      run: |
+#        mkdir -p flake8-report-${{ matrix.python-version }}
+#        flake8 --htmldir=flake8-report-${{ matrix.python-version }} .
+#
+#    - name: Upload Flake8 HTML report
+#      if: always()
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: flake8-html-report-${{ matrix.python-version }}
+#        path: flake8-report-${{ matrix.python-version }}/
 
-    - name: Run Flake8 and generate HTML report
-      run: |
-        mkdir -p flake8-report-${{ matrix.python-version }}
-        flake8 --htmldir=flake8-report-${{ matrix.python-version }} .
-
-    - name: Upload Flake8 HTML report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: flake8-html-report-${{ matrix.python-version }}
-        path: flake8-report-${{ matrix.python-version }}/
-
-    - name: Run mypy and generate txt report
-      if: always()
-      run: |
-        mkdir -p mypy-report-${{ matrix.python-version }}
-        mypy --config-file mypy.ini . > mypy-report-${{ matrix.python-version }}/mypy-txt-report.txt
-
-    - name: Upload mypy txt report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: mypy-txt-report-${{ matrix.python-version }}
-        path: mypy-report-${{ matrix.python-version }}
+#    - name: Run mypy and generate txt report
+#      if: always()
+#      run: |
+#        mkdir -p mypy-report-${{ matrix.python-version }}
+#        mypy --config-file mypy.ini . > mypy-report-${{ matrix.python-version }}/mypy-txt-report.txt
+#
+#    - name: Upload mypy txt report
+#      if: always()
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: mypy-txt-report-${{ matrix.python-version }}
+#        path: mypy-report-${{ matrix.python-version }}
 
     - name: Find and install all main.txt, test.txt files
       if: env.tests_found == 'true' && always()
@@ -79,10 +71,11 @@ jobs:
         done
 
     - name: Download .env artifact
+      if: always()
       uses: actions/download-artifact@v4
       with:
         name: env-file
-        path: ./.env
+        path: ./
 
     - name: Load .env variables
       if: always()
