@@ -32,7 +32,6 @@ jobs:
         else
           echo "tests_found=false" >> $GITHUB_ENV
         fi
-          
 
     - name: Run Flake8 and generate HTML report
       run: |
@@ -47,6 +46,7 @@ jobs:
         path: flake8-report-${{ matrix.python-version }}/
 
     - name: Run mypy and generate txt report
+      if: always()
       run: |
         mkdir -p mypy-report-${{ matrix.python-version }}
         mypy --config-file mypy.ini . > mypy-report-${{ matrix.python-version }}/mypy-txt-report.txt
