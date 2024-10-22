@@ -59,7 +59,7 @@ jobs:
         path: mypy-report-${{ matrix.python-version }}
 
     - name: Find and install all main.txt, test.txt files
-      if: env.tests_found == 'true'
+      if: env.tests_found == 'true' && always()
       run: |
         find . -name 'main.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
