@@ -65,7 +65,7 @@ jobs:
         find . -name 'main.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
           pip install -r "$req_file"
-#        done
+        done
         find . -name 'test.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
           pip install -r "$req_file"
