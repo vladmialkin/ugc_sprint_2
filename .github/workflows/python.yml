@@ -81,8 +81,7 @@ jobs:
         done
 
     - name: Run tests
-      if: always()
-      if: env.tests_found == 'true'
+      if: env.tests_found == 'true' && always()
       run: |
         pytest --maxfail=5 --disable-warnings
 
