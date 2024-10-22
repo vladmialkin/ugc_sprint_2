@@ -33,6 +33,14 @@ jobs:
           echo "tests_found=false" >> $GITHUB_ENV
         fi
 
+    - name: Check if .env exist
+      run: |
+        if find . -name '.env' | grep .; then
+          echo "env_found=true" >> $GITHUB_ENV
+        else
+          echo "env_found=false" >> $GITHUB_ENV
+        fi
+
     - name: Run Flake8 and generate HTML report
       run: |
         mkdir -p flake8-report-${{ matrix.python-version }}
@@ -71,7 +79,7 @@ jobs:
         done
 
     - name: Load .env variables
-      if: always()
+      if: env.env_found == 'true' && always()
       run: |
         find . -name '.env' | while read req_file; do
           export $(cat "$req_file" | grep -v '#' | awk '/=/ {print $1}')
