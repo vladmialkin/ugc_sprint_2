@@ -38,7 +38,7 @@ lark==1.1.9
 lockfile==0.12.2
 more-itertools==10.3.0
 msgpack==1.0.5
-nftables==0.1
+#nftables==0.1
 ordered-set==4.1.0
 packaging==24.1
 pexpect==4.9.0
