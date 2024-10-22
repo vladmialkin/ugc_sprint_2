@@ -69,7 +69,7 @@ sentry-sdk==2.15.0
 setuptools==69.5.1
 shellingham==1.5.4
 six==1.16.0
-smbus==1.1
+#smbus==1.1
 TBB==0.2
 terminator==2.1.4
 tomli==2.0.1
