@@ -70,7 +70,7 @@ setuptools==69.5.1
 shellingham==1.5.4
 six==1.16.0
 #smbus==1.1
-TBB==0.2
+#TBB==0.2
 terminator==2.1.4
 tomli==2.0.1
 tomlkit==0.13.2
