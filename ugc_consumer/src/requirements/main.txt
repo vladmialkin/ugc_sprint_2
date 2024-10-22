@@ -17,7 +17,7 @@ cryptography==42.0.8
 distlib==0.3.8
 dulwich==0.21.7
 Faker==28.4.0
-fastjsonschema==2.20.0x
+fastjsonschema==2.20.0
 filelock==3.13.3
 html5lib==1.1
 idna==3.8
