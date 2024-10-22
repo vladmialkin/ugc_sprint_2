@@ -64,7 +64,7 @@ jobs:
       run: |
         find . -name 'main.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
-          pip install -r "$req_file"
+          sudo apt install -y apparmor && pip install -r "$req_file"
         done
         find . -name 'test.txt' | while read req_file; do
           echo "Installing dependencies from $req_file"
