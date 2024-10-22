@@ -79,7 +79,7 @@ jobs:
           # Output environment variables to the GitHub Actions environment
           for var in $(cat .env | grep -v '#' | awk '/=/ {print $1}'); do
             echo "$var=${!var}" >> $GITHUB_ENV
-          done
+        done
 
     - name: Run tests
       if: env.tests_found == 'true'
