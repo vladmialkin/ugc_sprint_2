@@ -70,6 +70,17 @@ jobs:
           pip install -r "$req_file"
         done
 
+    - name: Load .env variables
+      run: |
+        # Check if .env file exists
+        find . -name '.env' | while req_file; do
+          # Export environment variables from .env file into the GitHub Actions environment
+          export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+          # Output environment variables to the GitHub Actions environment
+          for var in $(cat .env | grep -v '#' | awk '/=/ {print $1}'); do
+            echo "$var=${!var}" >> $GITHUB_ENV
+          done
+
     - name: Run tests
       if: env.tests_found == 'true'
       run: |
