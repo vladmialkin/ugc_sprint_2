@@ -77,7 +77,7 @@ tomlkit==0.13.2
 #trove-classifiers==2024.9.17
 typing_extensions==4.12.2
 urllib3==1.26.20
-validate==5.0.8
+#validate==5.0.8
 validate-pyproject==0.19
 virtualenv==20.26.2
 webencodings==0.5.1
