@@ -3,6 +3,7 @@ filebeat.inputs:
     enabled: true
     paths:
       - /var/log/nginx/*.log
+    tags: ["nginx"]
 
 output.logstash:
   hosts: ["movies-logstash:5044"]
