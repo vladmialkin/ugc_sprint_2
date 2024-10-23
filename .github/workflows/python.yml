@@ -24,27 +24,30 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: env
-        path: ./auth/src/.env
+        path: ./ugh_sprint2/auth/src/.env
 
-    - name: Download .env artifact
-      if: always()
-      uses: actions/download-artifact@v4
-      with:
-        name: env
-        path: ./auth/src/
+#    - name: Download .env artifact
+#      if: always()
+#      uses: actions/download-artifact@v4
+#      with:
+#        name: env
+#        path: ./auth/src/
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f ci_cd_requirements.txt ]; then pip install -r ci_cd_requirements.txt; fi
+    - name: Check if .env file exists
+      run: ls -la ./ugh_sprint2/auth/src/
 
-    - name: Check if tests exist
-      run: |
-        if find . -name 'test_*.py' | grep .; then
-          echo "tests_found=true" >> $GITHUB_ENV
-        else
-          echo "tests_found=false" >> $GITHUB_ENV
-        fi
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        if [ -f ci_cd_requirements.txt ]; then pip install -r ci_cd_requirements.txt; fi
+#
+#    - name: Check if tests exist
+#      run: |
+#        if find . -name 'test_*.py' | grep .; then
+#          echo "tests_found=true" >> $GITHUB_ENV
+#        else
+#          echo "tests_found=false" >> $GITHUB_ENV
+#        fi
 
 ##    - name: Run Flake8 and generate HTML report
 ##      run: |
@@ -71,17 +74,17 @@ jobs:
 ##        name: mypy-txt-report-${{ matrix.python-version }}
 ##        path: mypy-report-${{ matrix.python-version }}
 #
-    - name: Find and install all main.txt, test.txt files
-      if: env.tests_found == 'true' && always()
-      run: |
-        find . -name 'main.txt' | while read req_file; do
-          echo "Installing dependencies from $req_file"
-          pip install -r "$req_file"
-        done
-        find . -name 'test.txt' | while read req_file; do
-          echo "Installing dependencies from $req_file"
-          pip install -r "$req_file"
-        done
+#    - name: Find and install all main.txt, test.txt files
+#      if: env.tests_found == 'true' && always()
+#      run: |
+#        find . -name 'main.txt' | while read req_file; do
+#          echo "Installing dependencies from $req_file"
+#          pip install -r "$req_file"
+#        done
+#        find . -name 'test.txt' | while read req_file; do
+#          echo "Installing dependencies from $req_file"
+#          pip install -r "$req_file"
+#        done
 #
 #    - name: Download .env artifact
 #      if: always()
@@ -90,23 +93,23 @@ jobs:
 #        name: env-file
 #        path: ./auth/src/.env
 #
-    - name: Load .env variables
-      if: always()
-      run: |
-        export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
-        for var in $(cat .env | grep -v '#' | awk '/=/ {print $1}'); do
-          echo "$var=${!var}" >> $GITHUB_ENV
-        done
-
-    - name: Run tests
-      if: env.tests_found == 'true' && always()
-      run: |
-        pytest --maxfail=5 --disable-warnings
-
-    - name: Notify if no tests found
-      if: env.tests_found == 'false' && always()
-      run: |
-        echo "No tests were found in the repository."
+#    - name: Load .env variables
+#      if: always()
+#      run: |
+#        export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+#        for var in $(cat .env | grep -v '#' | awk '/=/ {print $1}'); do
+#          echo "$var=${!var}" >> $GITHUB_ENV
+#        done
+#
+#    - name: Run tests
+#      if: env.tests_found == 'true' && always()
+#      run: |
+#        pytest --maxfail=5 --disable-warnings
+#
+#    - name: Notify if no tests found
+#      if: env.tests_found == 'false' && always()
+#      run: |
+#        echo "No tests were found in the repository."
 #
 #  notify:
 #    runs-on: ubuntu-latest
