@@ -24,7 +24,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: .env
-        path: ./auth/src/
+        path: ./auth/src/.env
 
     - name: Download .env artifact
       if: always()
