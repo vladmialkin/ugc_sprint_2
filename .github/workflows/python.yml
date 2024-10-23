@@ -35,7 +35,7 @@ jobs:
 
     - name: Check if .env file exists
       run: |
-        ls -la ./
+        ls -la ./auth
 #        ls -la ./ugc_sprint_2/auth/src/
 
 #    - name: Install dependencies
