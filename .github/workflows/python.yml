@@ -23,8 +23,8 @@ jobs:
     - name: Upload .env artifact
       uses: actions/upload-artifact@v4
       with:
-        name: .env
-        path: ./ugh_sprint2/auth/src/.env
+        name: env
+        path: ./ugc_sprint_2/auth/src/.env
 
 #    - name: Download .env artifact
 #      if: always()
@@ -34,7 +34,7 @@ jobs:
 #        path: ./auth/src/
 
     - name: Check if .env file exists
-      run: ls -la ./ugh_sprint2/auth/src/
+      run: ls -la ./ugc_sprint_2/auth/src/
 
 #    - name: Install dependencies
 #      run: |
