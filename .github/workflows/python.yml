@@ -23,7 +23,7 @@ jobs:
     - name: Upload .env artifact
       uses: actions/upload-artifact@v4
       with:
-        name: env
+        name: .env
         path: ./ugh_sprint2/auth/src/.env
 
 #    - name: Download .env artifact
